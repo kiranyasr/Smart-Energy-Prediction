@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card p-4" style="background-color:#0b1e3a;">
+    <h2 class="mb-3" style="color:#00bfff;">Energy Fluctuation Dashboard</h2>
+
+    <!-- Buttons -->
+    <div class="mb-3">
+        <button class="btn btn-primary" onclick="showChart('solar')">Solar</button>
+        <button class="btn btn-secondary" onclick="showChart('wind')">Wind</button>
+        <button class="btn btn-success" onclick="showChart('combined')">Combined</button>
+    </div>
+
+    <!-- Chart -->
+    <canvas id="energyChart" style="max-height:400px;"></canvas>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const solarData = {{ solar_data|tojson }};
+const windData = {{ wind_data|tojson }};
+const labels = Array.from({length: solarData.length}, (_, i) => "T" + (i + 1));
+
+const ctx = document.getElementById("energyChart").getContext("2d");
+let chart = new Chart(ctx, {
+    type: "line",
+    data: {
+        labels: labels,
+        datasets: [{
+            label: "Solar",
+            data: solarData,
+            borderColor: "red",
+            backgroundColor: "transparent",
+            fill: false,
+            tension: 0.4,
+            borderWidth: 2,
+            pointRadius: 0
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            x: {
+                ticks: { color: "#fff" },
+                grid: {
+                    color: "#1a2b4c",
+                    borderColor: "#0b1e3a"
+                }
+            },
+            y: {
+                ticks: { color: "#fff" },
+                grid: {
+                    color: "#1a2b4c",
+                    borderColor: "#0b1e3a"
+                }
+            }
+        }
+    }
+});
+
+// Switch datasets dynamically
+function showChart(type) {
+    if (type === "solar") {
+        chart.data.datasets = [{
+            label: "Solar",
+            data: solarData,
+            borderColor: "red",
+            backgroundColor: "transparent",
+            fill: false,
+            tension: 0.4,
+            borderWidth: 2,
+            pointRadius: 0
+        }];
+    } else if (type === "wind") {
+        chart.data.datasets = [{
+            label: "Wind",
+            data: windData,
+            borderColor: "yellow",
+            backgroundColor: "transparent",
+            fill: false,
+            tension: 0.4,
+            borderWidth: 2,
+            pointRadius: 0
+        }];
+    } else if (type === "combined") {
+        chart.data.datasets = [
+            {
+                label: "Solar",
+                data: solarData,
+                borderColor: "red",
+                backgroundColor: "transparent",
+                fill: false,
+                tension: 0.4,
+                borderWidth: 2,
+                pointRadius: 0
+            },
+            {
+                label: "Wind",
+                data: windData,
+                borderColor: "yellow",
+                backgroundColor: "transparent",
+                fill: false,
+                tension: 0.4,
+                borderWidth: 2,
+                pointRadius: 0
+            }
+        ];
+    }
+    chart.update();
+}
+</script>
+{% endblock %}

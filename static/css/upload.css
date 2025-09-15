@@ -1,0 +1,60 @@
+/* Upload Page Styles */
+.upload-container {
+  background: #1e293b;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 700px;
+  margin: 2rem auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+.upload-container h2 {
+  color: #38bdf8;
+  margin-bottom: 1rem;
+}
+
+form {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+input[type="file"] {
+  background: #0f172a;
+  color: #e2e8f0;
+  border: 1px solid #334155;
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+
+button {
+  background: #38bdf8;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  color: white;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background: #0284c7;
+}
+
+.preview {
+  margin-top: 1.5rem;
+  background: #0f172a;
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.success-message {
+  background: #064e3b;
+  color: #34d399;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+  font-weight: 500;
+}

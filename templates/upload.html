@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="upload-container">
+  <h2 style="color:#00bfff;">Energy Data Processor</h2>
+  <p>Upload your CSV dataset to clean and prepare it for analysis.</p>
+  
+  <!-- Upload Form -->
+  <form method="POST" enctype="multipart/form-data">
+    <input type="file" name="dataset" accept=".csv" required>
+    <button type="submit">Clean & Save Dataset</button>
+  </form>
+
+  {% if preview %}
+  <!-- Success Message -->
+  <div class="success-message mt-3">✔ Success! Dataset Processed.</div>
+  
+  <!-- Preview Table -->
+  <div class="preview mt-3">
+    {{ preview|safe }}
+  </div>
+
+  <!-- Buttons -->
+  <div class="mt-3">
+    <a href="{{ url_for('main.download_cleaned', filename=cleaned_file) }}" class="btn btn-success">
+      ⬇ Download Cleaned Dataset
+    </a>
+    <a href="{{ url_for('main.dashboard') }}" class="btn btn-info">
+      📊 View Dashboard →
+    </a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

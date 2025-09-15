@@ -1,0 +1,43 @@
+/* Dashboard Page Styles */
+.dashboard-container {
+  max-width: 1000px;
+  margin: 2rem auto;
+  background: #1e293b;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+.dashboard-container h2 {
+  color: #38bdf8;
+  margin-bottom: 1.5rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.tabs button {
+  background: #334155;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  color: #e2e8f0;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.tabs button:hover,
+.tabs button.active {
+  background: #38bdf8;
+  color: #0f172a;
+}
+
+#chart-container {
+  background: #0f172a;
+  border-radius: 12px;
+  padding: 1rem;
+}
