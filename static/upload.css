@@ -1,0 +1,221 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  background-color: #0d1117;
+  color: #00e7ff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.container {
+  background: rgba(5, 29, 41, 0.75);
+  border: 1px solid #00e7ff;
+  border-radius: 20px;
+  padding: 40px 50px;
+  width: 100%;
+  max-width: 550px; /* Slightly increased width for better table display */
+  text-align: center;
+  box-shadow: 0 0 35px #00e7ff44;
+  position: relative;
+}
+
+/* Title and Subtitle */
+.title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin-bottom: 5px;
+  color: #00e7ff;
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  margin-bottom: 30px;
+  color: #cad7e26e;
+  font-weight: 400;
+}
+
+/* Drag & Drop Circle */
+.drag-drop {
+  cursor: pointer;
+  display: inline-block;
+  user-select: none;
+}
+
+.circle-border {
+  border: 3px solid #00e7ff;
+  border-radius: 50%;
+  width: 140px;
+  height: 140px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin: 0 auto 30px;
+  position: relative;
+  box-shadow: 0 0 10px #00e7ff, inset 0 0 20px #00e7ff;
+  transition: box-shadow 0.3s ease;
+}
+
+.circle-border:hover {
+  box-shadow: 0 0 20px #00ffff, inset 0 0 30px #00ffff;
+}
+
+.icon-upload {
+  font-size: 40px;
+  color: #0ff;
+}
+
+.drag-text {
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-top: 8px;
+  color: #00e7ffcc;
+  letter-spacing: 0.06em;
+}
+
+/* Harmonize Button */
+.harmonize-btn {
+  background: transparent;
+  border: 2px solid #00e7ff;
+  color: #0ff;
+  font-weight: 600;
+  padding: 12px 25px;
+  border-radius: 10px;
+  margin: 20px auto 25px;
+  width: 100%;
+  max-width: 350px;
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  box-shadow: 0 0 20px #00e7ff55;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.harmonize-btn:hover {
+  background-color: #00e7ff14;
+  box-shadow: 0 0 30px #00e7ffaa;
+}
+
+/* System Alert */
+.system-alert {
+  background: #041d23;
+  border: 1px solid #0ff36f;
+  border-radius: 6px;
+  padding: 12px 20px;
+  color: #0ff36f;
+  font-size: 0.85rem;
+  text-align: center;
+  margin-bottom: 30px;
+  box-shadow: 0 0 15px #0ff36f88;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.system-alert i {
+  margin-left: 8px;
+}
+
+/* Styles for the Preview Title */
+.preview-title {
+    font-size: 0.9rem;
+    color: #00e7ff;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 15px;
+    margin-top: 30px;
+    border-bottom: 1px solid #00e7ff55;
+    padding-bottom: 10px;
+}
+
+/* Container to handle table overflow */
+.preview-table-container {
+    max-height: 300px;
+    overflow: auto;
+    margin-bottom: 30px;
+    border-radius: 12px;
+    border: 1px solid #00e7ff88;
+    box-shadow: 0 0 15px #00e7ff55;
+}
+
+/* Neon Table */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table thead {
+  background-color: #002f44;
+  position: sticky;
+  top: 0;
+}
+
+.data-table thead th {
+  color: #00e7ff;
+  font-weight: 600;
+  padding: 12px 15px;
+  border-bottom: 1.5px solid #00e7ff;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+.data-table tbody tr {
+  border-top: 1px solid #003c56;
+  transition: background-color 0.25s ease;
+}
+
+.data-table tbody tr:hover {
+  background-color: #003c56aa;
+}
+
+.data-table tbody td {
+  color: #9afcff;
+  padding: 12px 15px;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.data-table tbody td:first-child {
+  text-align: left;
+}
+
+/* Dashboard Button */
+.dashboard-btn {
+  background: transparent;
+  border: 2px solid #00e7ff;
+  color: #00ffff;
+  font-weight: 600;
+  padding: 12px 25px;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 350px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  box-shadow: 0 0 20px #00e7ff55;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.dashboard-btn:hover {
+  background-color: #00e7ff14;
+  box-shadow: 0 0 30px #00e7ffaa;
+}

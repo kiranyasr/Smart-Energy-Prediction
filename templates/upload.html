@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Interface - Upload</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='upload.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="title">DATA HARMONIZER</h1>
+    <p class="subtitle">Upload system data for processing</p>
+
+    <form action="{{ url_for('upload_page') }}" method="post" enctype="multipart/form-data" id="upload-form">
+        <input class="file-input" type="file" name="file" hidden>
+
+        {% if success %}
+            <div class="system-alert">
+                FILE HARMONIZED <i class="fas fa-check-circle"></i>
+            </div>
+            
+            <h2 class="preview-title">DATA PREVIEW (FIRST 10 ROWS)</h2>
+            <div class="preview-table-container">
+                {{ preview|safe }}
+            </div>
+            
+            <a href="{{ url_for('dashboard') }}" class="dashboard-btn">VIEW FULL DASHBOARD</a>
+
+        {% else %}
+            <div class="drag-drop">
+                <div class="circle-border">
+                    <i class="fas fa-cloud-upload-alt icon-upload"></i>
+                </div>
+                <span class="drag-text">DRAG & DROP</span>
+            </div>
+            
+            <button type="button" class="harmonize-btn" id="browse-btn">
+                <i class="fas fa-cogs"></i>
+                <span>HARMONIZE</span>
+            </button>
+        {% endif %}
+    </form>
+</div>
+
+<script>
+    const form = document.getElementById("upload-form"),
+          fileInput = document.querySelector(".file-input"),
+          browseBtn = document.getElementById("browse-btn"),
+          dragDropArea = document.querySelector(".drag-drop");
+
+    if (browseBtn) {
+        browseBtn.addEventListener("click", () => fileInput.click());
+    }
+    if (dragDropArea) {
+        dragDropArea.addEventListener("click", () => fileInput.click());
+    }
+    
+    fileInput.addEventListener("change", () => {
+        const fileName = fileInput.value;
+        if (fileName) {
+            if (fileName.endsWith(".csv")) {
+                form.submit();
+            } else {
+                alert("SYSTEM ERROR: Please select a valid CSV file.");
+                fileInput.value = "";
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

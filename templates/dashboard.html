@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom/dist/chartjs-plugin-zoom.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="main-header">
+            <h1 class="title">ENERGY ANALYSIS DASHBOARD</h1>
+            <p class="subtitle">Interactive analysis of energy production and volatility</p>
+        </header>
+
+        <div class="view-selector">
+            <button class="view-btn" onclick="updateCharts('solar')">Solar</button>
+            <button class="view-btn" onclick="updateCharts('wind')">Wind</button>
+            <button class="view-btn active" onclick="updateCharts('combined')">Solar vs Wind</button>
+        </div>
+
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <p class="kpi-title">Solar Volatility</p>
+                <h2 class="kpi-value">{{ kpi_data.solar_volatility }}</h2>
+            </div>
+            <div class="kpi-card">
+                <p class="kpi-title">Wind Volatility</p>
+                <h2 class="kpi-value">{{ kpi_data.wind_volatility }}</h2>
+            </div>
+            <div class="kpi-card">
+                <p class="kpi-title">Combined Volatility</p>
+                <h2 class="kpi-value">{{ kpi_data.combined_volatility }}</h2>
+            </div>
+        </div>
+
+        <div class="chart-grid">
+            <div class="chart-container">
+                <h3 class="chart-title">Energy Production</h3>
+                <canvas id="productionChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3 class="chart-title">7-Day Rolling Volatility</h3>
+                <canvas id="volatilityChart"></canvas>
+            </div>
+        </div>
+
+        <div class="actions">
+            <a href="{{ url_for('download_fluctuation_data') }}" class="action-btn">Download Full Analysis</a>
+            <a href="{{ url_for('upload_page') }}" class="action-btn secondary">Process New File</a>
+        </div>
+    </div>
+
+<script>
+    const chartData = {{ chart_data | tojson }};
+    Chart.defaults.color = '#00e7ff88';
+    Chart.defaults.borderColor = '#00e7ff22';
+
+    // --- Define all possible datasets ---
+    const datasets = {
+        production: {
+            solar: { label: 'Solar Production', data: chartData.solar_production, borderColor: '#00e7ff', backgroundColor: '#00e7ff33', fill: true },
+            wind: { label: 'Wind Production', data: chartData.wind_production, borderColor: '#0ff36f', backgroundColor: '#0ff36f33', fill: true }
+        },
+        volatility: {
+            solar: { label: 'Solar Volatility', data: chartData.solar_7d_std, borderColor: '#00e7ff' },
+            wind: { label: 'Wind Volatility', data: chartData.wind_7d_std, borderColor: '#0ff36f' },
+            combined: { label: 'Combined Volatility', data: chartData.combined_7d_std, borderColor: '#f2c94c' }
+        }
+    };
+    
+    // --- Common Chart Configuration ---
+    const createOptions = (isStacked = false) => ({
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        scales: {
+            x: { type: 'time', time: { unit: 'month', tooltipFormat: 'MMM dd, yyyy' }, ticks: { color: '#00e7ff88' }},
+            y: { ticks: { color: '#00e7ff88' }, stacked: isStacked }
+        },
+        plugins: {
+            legend: { position: 'top', labels: { color: '#00e7ff' }},
+            zoom: { pan: { enabled: true, mode: 'x' }, zoom: { wheel: { enabled: true }, mode: 'x' }}
+        }
+    });
+
+    const baseDatasetConfig = { borderWidth: 1.5, pointRadius: 0 };
+
+    // --- Initialize Charts ---
+    const prodCtx = document.getElementById('productionChart').getContext('2d');
+    const productionChart = new Chart(prodCtx, {
+        type: 'line',
+        data: { labels: chartData.labels, datasets: [] },
+        options: createOptions(true) // Stacked chart
+    });
+
+    const volCtx = document.getElementById('volatilityChart').getContext('2d');
+    const volatilityChart = new Chart(volCtx, {
+        type: 'line',
+        data: { labels: chartData.labels, datasets: [] },
+        options: createOptions() // Not stacked
+    });
+
+    // --- Main Update Function ---
+    function updateCharts(view) {
+        // Clear existing datasets
+        productionChart.data.datasets = [];
+        volatilityChart.data.datasets = [];
+
+        // Update Production Chart
+        if (view === 'solar') {
+            productionChart.data.datasets.push({ ...datasets.production.solar, ...baseDatasetConfig });
+        } else if (view === 'wind') {
+            productionChart.data.datasets.push({ ...datasets.production.wind, ...baseDatasetConfig });
+        } else { // 'combined'
+            productionChart.data.datasets.push({ ...datasets.production.solar, ...baseDatasetConfig });
+            productionChart.data.datasets.push({ ...datasets.production.wind, ...baseDatasetConfig });
+        }
+        
+        // Update Volatility Chart
+        if (view === 'solar') {
+            volatilityChart.data.datasets.push({ ...datasets.volatility.solar, ...baseDatasetConfig });
+        } else if (view === 'wind') {
+            volatilityChart.data.datasets.push({ ...datasets.volatility.wind, ...baseDatasetConfig });
+        } else { // 'combined'
+            volatilityChart.data.datasets.push({ ...datasets.volatility.solar, ...baseDatasetConfig });
+            volatilityChart.data.datasets.push({ ...datasets.volatility.wind, ...baseDatasetConfig });
+            volatilityChart.data.datasets.push({ ...datasets.volatility.combined, ...baseDatasetConfig });
+        }
+        
+        productionChart.update();
+        volatilityChart.update();
+
+        // Update button styles
+        document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.view-btn[onclick="updateCharts('${view}')"]`).classList.add('active');
+    }
+
+    // --- Initial Load ---
+    document.addEventListener('DOMContentLoaded', () => {
+        updateCharts('combined'); // Load the combined view by default
+    });
+</script>
+</body>
+</html>
