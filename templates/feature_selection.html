@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 4: Feature Selection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="main-header">
+            <h1 class="title">FEATURE SELECTION & EXTRACTION</h1>
+            <p class="subtitle">Finalizing features with RandomForest Importance and PCA</p>
+        </header>
+
+        <div class="chart-grid">
+            <div class="chart-container">
+                <h3 class="chart-title">Final Feature Importance</h3>
+                <canvas id="importanceChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3 class="chart-title">PCA: Principal Component Analysis (2D)</h3>
+                <canvas id="pcaChart"></canvas>
+            </div>
+        </div>
+
+        <div class="feature-list-grid">
+            <div class="feature-list-container">
+                <h3 class="chart-title">Selected Features</h3>
+                <ul class="feature-list selected">
+                    {% for feature in page_data.selected_features %}
+                        <li>{{ feature }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="feature-list-container">
+                <h3 class="chart-title">Dropped Features (Redundant)</h3>
+                <ul class="feature-list dropped">
+                    {% for feature in page_data.dropped_features %}
+                        <li>{{ feature }}</li>
+                    {% else %}
+                        <li>None</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        
+        <div class="actions">
+             <a href="{{ url_for('feature_engineering') }}" class="action-btn secondary">Back to Feature Engineering</a>
+        </div>
+    </div>
+
+<script>
+    // (JavaScript remains unchanged)
+    const pageData = {{ page_data | tojson }};
+    const impCtx = document.getElementById('importanceChart').getContext('2d');
+    new Chart(impCtx, {
+        type: 'bar',
+        data: {
+            labels: pageData.importance.map(d => d.feature),
+            datasets: [{ label: 'Importance', data: pageData.importance.map(d => d.importance), backgroundColor: '#00e7ff55', borderColor: '#00e7ff', borderWidth: 1.5 }]
+        },
+        options: {
+            indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { x: { ticks: { color: '#00e7ff88' } }, y: { ticks: { color: '#00e7ff' } } }
+        }
+    });
+    const pcaCtx = document.getElementById('pcaChart').getContext('2d');
+    new Chart(pcaCtx, {
+        type: 'scatter',
+        data: {
+            datasets: [{ label: 'PCA Components', data: pageData.pca_data.map(d => ({ x: d.PC1, y: d.PC2 })), backgroundColor: pageData.pca_data.map(d => `rgba(0, 231, 255, ${d.production + 0.1})`) }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { type: 'linear', position: 'bottom', title: { display: true, text: 'Principal Component 1', color: '#00e7ff' }, ticks: { color: '#00e7ff88' } },
+                y: { title: { display: true, text: 'Principal Component 2', color: '#00e7ff' }, ticks: { color: '#00e7ff88' } }
+            }
+        }
+    });
+</script>
+</body>
+</html>

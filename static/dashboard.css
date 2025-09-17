@@ -171,6 +171,47 @@ body {
   box-shadow: 0 0 15px #00e7ff;
 }
 
+/* Styles for Day 4 Feature Lists */
+.feature-list-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+.feature-list-container {
+  background: rgba(5, 29, 41, 0.75);
+  border: 1px solid #00e7ff88;
+  border-radius: 12px;
+  padding: 25px;
+}
+
+.feature-list {
+  list-style-type: none;
+  padding: 0;
+  text-align: left;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.feature-list li {
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.feature-list.selected li {
+  background-color: #0ff36f22;
+  color: #0ff36f;
+}
+
+.feature-list.dropped li {
+  background-color: #f2c94c22;
+  color: #f2c94c;
+}
+
 /* Responsive */
 @media (max-width: 1200px) {
     .chart-grid {

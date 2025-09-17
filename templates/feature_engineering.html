@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 3: Feature Engineering</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="main-header">
+            <h1 class="title">FEATURE ANALYSIS</h1>
+            <p class="subtitle">Ranking feature importance with a Random Forest Model</p>
+        </header>
+
+        <div class="view-selector">
+            <button class="view-btn active" onclick="updateView('Solar')">Solar Features</button>
+            <button class="view-btn" onclick="updateView('Wind')">Wind Features</button>
+        </div>
+
+        <div id="Solar-view" class="view-content">
+            <h3 class="chart-title">Feature Importance Ranking</h3>
+            <div class="chart-container" style="height: 400px;">
+                <canvas id="solarImportanceChart"></canvas>
+            </div>
+        </div>
+
+        <div id="Wind-view" class="view-content" style="display: none;">
+            <h3 class="chart-title">Feature Importance Ranking</h3>
+            <div class="chart-container" style="height: 400px;">
+                <canvas id="windImportanceChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="actions">
+             <a href="{{ url_for('feature_selection') }}" class="action-btn">Features Extraction</a>
+             <a href="{{ url_for('dashboard') }}" class="action-btn secondary">Back to Dashboard</a>
+        </div>
+    </div>
+
+<script>
+    // (JavaScript remains unchanged)
+    const engineeredData = {{ engineered_data | tojson }};
+    let solarImportanceChart, windImportanceChart;
+    function drawImportanceChart(canvasId, data) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        const labels = data.map(d => d.feature);
+        const values = data.map(d => d.importance);
+        return new Chart(ctx, {
+            type: 'bar',
+            data: { labels: labels, datasets: [{
+                label: 'Importance', data: values, backgroundColor: '#00e7ff55', borderColor: '#00e7ff', borderWidth: 1.5
+            }]},
+            options: {
+                indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { x: { ticks: { color: '#00e7ff88' } }, y: { ticks: { color: '#00e7ff' } } }
+            }
+        });
+    }
+    function updateView(source) {
+        document.querySelectorAll('.view-content').forEach(el => el.style.display = 'none');
+        document.getElementById(`${source}-view`).style.display = 'block';
+        document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.view-btn[onclick="updateView('${source}')"]`).classList.add('active');
+        if (source === 'Solar' && !solarImportanceChart) {
+            solarImportanceChart = drawImportanceChart('solarImportanceChart', engineeredData.Solar.importance);
+        } else if (source === 'Wind' && !windImportanceChart) {
+            windImportanceChart = drawImportanceChart('windImportanceChart', engineeredData.Wind.importance);
+        }
+    }
+    document.addEventListener('DOMContentLoaded', () => { updateView('Solar'); });
+</script>
+</body>
+</html>

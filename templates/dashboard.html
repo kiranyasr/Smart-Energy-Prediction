@@ -49,7 +49,7 @@
         </div>
 
         <div class="actions">
-            <a href="{{ url_for('download_fluctuation_data') }}" class="action-btn">Download Full Analysis</a>
+            <a href="{{ url_for('feature_engineering') }}" class="action-btn">Engineer Features</a>
             <a href="{{ url_for('upload_page') }}" class="action-btn secondary">Process New File</a>
         </div>
     </div>
@@ -59,7 +59,6 @@
     Chart.defaults.color = '#00e7ff88';
     Chart.defaults.borderColor = '#00e7ff22';
 
-    // --- Define all possible datasets ---
     const datasets = {
         production: {
             solar: { label: 'Solar Production', data: chartData.solar_production, borderColor: '#00e7ff', backgroundColor: '#00e7ff33', fill: true },
@@ -72,7 +71,6 @@
         }
     };
     
-    // --- Common Chart Configuration ---
     const createOptions = (isStacked = false) => ({
         responsive: true,
         maintainAspectRatio: false,
@@ -89,28 +87,24 @@
 
     const baseDatasetConfig = { borderWidth: 1.5, pointRadius: 0 };
 
-    // --- Initialize Charts ---
     const prodCtx = document.getElementById('productionChart').getContext('2d');
     const productionChart = new Chart(prodCtx, {
         type: 'line',
         data: { labels: chartData.labels, datasets: [] },
-        options: createOptions(true) // Stacked chart
+        options: createOptions(true)
     });
 
     const volCtx = document.getElementById('volatilityChart').getContext('2d');
     const volatilityChart = new Chart(volCtx, {
         type: 'line',
         data: { labels: chartData.labels, datasets: [] },
-        options: createOptions() // Not stacked
+        options: createOptions()
     });
 
-    // --- Main Update Function ---
     function updateCharts(view) {
-        // Clear existing datasets
         productionChart.data.datasets = [];
         volatilityChart.data.datasets = [];
 
-        // Update Production Chart
         if (view === 'solar') {
             productionChart.data.datasets.push({ ...datasets.production.solar, ...baseDatasetConfig });
         } else if (view === 'wind') {
@@ -120,7 +114,6 @@
             productionChart.data.datasets.push({ ...datasets.production.wind, ...baseDatasetConfig });
         }
         
-        // Update Volatility Chart
         if (view === 'solar') {
             volatilityChart.data.datasets.push({ ...datasets.volatility.solar, ...baseDatasetConfig });
         } else if (view === 'wind') {
@@ -134,14 +127,12 @@
         productionChart.update();
         volatilityChart.update();
 
-        // Update button styles
         document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelector(`.view-btn[onclick="updateCharts('${view}')"]`).classList.add('active');
     }
 
-    // --- Initial Load ---
     document.addEventListener('DOMContentLoaded', () => {
-        updateCharts('combined'); // Load the combined view by default
+        updateCharts('combined');
     });
 </script>
 </body>
