@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 5: ML Models</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom/dist/chartjs-plugin-zoom.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="main-header">
+            <h1 class="title">PREDICTIVE MODEL PERFORMANCE</h1>
+            <p class="subtitle">Evaluating RandomForest vs. GradientBoosting for Solar & Wind Prediction</p>
+        </header>
+
+        <div class="model-section">
+            <h2 class="section-title">Solar Prediction Analysis</h2>
+            <div class="chart-grid">
+                <div class="chart-container">
+                    <h3 class="chart-title">Actual vs. Predicted Production (Solar)</h3>
+                    <canvas id="solarModelChart"></canvas>
+                </div>
+                <div class="results-container">
+                    <h3 class="chart-title">Model Performance Metrics</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Model</th><th>MAE</th><th>RMSE</th><th>R² Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>RandomForest</td>
+                                <td>{{ page_data.Solar.metrics.RandomForest.mae }}</td>
+                                <td>{{ page_data.Solar.metrics.RandomForest.rmse }}</td>
+                                <td>{{ page_data.Solar.metrics.RandomForest.r2 }}</td>
+                            </tr>
+                            <tr>
+                                <td>GradientBoosting</td>
+                                <td>{{ page_data.Solar.metrics.GradientBoosting.mae }}</td>
+                                <td>{{ page_data.Solar.metrics.GradientBoosting.rmse }}</td>
+                                <td>{{ page_data.Solar.metrics.GradientBoosting.r2 }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="model-section">
+            <h2 class="section-title">Wind Prediction Analysis</h2>
+            <div class="chart-grid">
+                <div class="chart-container">
+                    <h3 class="chart-title">Actual vs. Predicted Production (Wind)</h3>
+                    <canvas id="windModelChart"></canvas>
+                </div>
+                <div class="results-container">
+                    <h3 class="chart-title">Model Performance Metrics</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Model</th><th>MAE</th><th>RMSE</th><th>R² Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>RandomForest</td>
+                                <td>{{ page_data.Wind.metrics.RandomForest.mae }}</td>
+                                <td>{{ page_data.Wind.metrics.RandomForest.rmse }}</td>
+                                <td>{{ page_data.Wind.metrics.RandomForest.r2 }}</td>
+                            </tr>
+                            <tr>
+                                <td>GradientBoosting</td>
+                                <td>{{ page_data.Wind.metrics.GradientBoosting.mae }}</td>
+                                <td>{{ page_data.Wind.metrics.GradientBoosting.rmse }}</td>
+                                <td>{{ page_data.Wind.metrics.GradientBoosting.r2 }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions">
+             <a href="{{ url_for('feature_selection') }}" class="action-btn secondary">Back to Feature Selection</a>
+        </div>
+    </div>
+
+<script>
+    const pageData = {{ page_data | tojson }};
+
+    const commonOptions = {
+        responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+        scales: {
+            x: { type: 'time', time: { unit: 'day' }, ticks: { color: '#00e7ff88' }},
+            y: { title: { display: true, text: 'Production', color: '#00e7ff' }, ticks: { color: '#00e7ff88' }}
+        },
+        plugins: {
+            legend: { position: 'top', labels: { color: '#00e7ff' }},
+            zoom: { pan: { enabled: true, mode: 'x' }, zoom: { wheel: { enabled: true }, mode: 'x' }}
+        }
+    };
+    
+    // --- Solar Chart ---
+    const solarCtx = document.getElementById('solarModelChart').getContext('2d');
+    new Chart(solarCtx, {
+        type: 'line',
+        data: {
+            labels: pageData.Solar.chart_data.labels,
+            datasets: [
+                { label: 'Actual', data: pageData.Solar.chart_data.actual, borderColor: '#00e7ff', borderWidth: 2, pointRadius: 0 },
+                { label: 'RandomForest', data: pageData.Solar.chart_data.rf_predicted, borderColor: '#0ff36f', borderWidth: 1.5, pointRadius: 0, borderDash: [5, 5] },
+                { label: 'GradientBoosting', data: pageData.Solar.chart_data.gb_predicted, borderColor: '#f2c94c', borderWidth: 1.5, pointRadius: 0, borderDash: [5, 5] }
+            ]
+        },
+        options: commonOptions
+    });
+
+    // --- Wind Chart ---
+    const windCtx = document.getElementById('windModelChart').getContext('2d');
+    new Chart(windCtx, {
+        type: 'line',
+        data: {
+            labels: pageData.Wind.chart_data.labels,
+            datasets: [
+                { label: 'Actual', data: pageData.Wind.chart_data.actual, borderColor: '#00e7ff', borderWidth: 2, pointRadius: 0 },
+                { label: 'RandomForest', data: pageData.Wind.chart_data.rf_predicted, borderColor: '#0ff36f', borderWidth: 1.5, pointRadius: 0, borderDash: [5, 5] },
+                { label: 'GradientBoosting', data: pageData.Wind.chart_data.gb_predicted, borderColor: '#f2c94c', borderWidth: 1.5, pointRadius: 0, borderDash: [5, 5] }
+            ]
+        },
+        options: commonOptions
+    });
+</script>
+</body>
+</html>

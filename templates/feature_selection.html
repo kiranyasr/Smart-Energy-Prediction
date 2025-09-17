@@ -51,6 +51,11 @@
         </div>
     </div>
 
+        <div class="actions">
+             <a href="{{ url_for('ml_models') }}" class="action-btn">Train Predictive Models (Day 5)</a>
+             <a href="{{ url_for('feature_engineering') }}" class="action-btn secondary">Back to Feature Engineering</a>
+        </div>
+
 <script>
     // (JavaScript remains unchanged)
     const pageData = {{ page_data | tojson }};

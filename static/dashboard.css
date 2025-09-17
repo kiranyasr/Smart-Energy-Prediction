@@ -212,6 +212,37 @@ body {
   color: #f2c94c;
 }
 
+/* Styles for Day 5 ML Models Page */
+.model-section {
+  margin-bottom: 50px;
+  background: rgba(5, 29, 41, 0.5);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #00e7ff33;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #00e7ff;
+  margin-bottom: 20px;
+  text-align: left;
+  border-bottom: 1px solid #00e7ff55;
+  padding-bottom: 10px;
+}
+
+.results-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 20px;
+}
+
+/* Ensure data-table is styled correctly */
+.data-table tbody td {
+    font-weight: 600;
+}
+
 /* Responsive */
 @media (max-width: 1200px) {
     .chart-grid {

@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, session, redirect, url_for, send_file
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.decomposition import PCA
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import os
 import numpy as np
 
@@ -88,8 +89,7 @@ def engineer_features(df_source):
     source_df['rolling_std_24h'] = source_df['Production'].rolling(window=24).std()
     
     timestamp_s = source_df.index.map(pd.Timestamp.timestamp)
-    day_secs = 24 * 60 * 60
-    year_secs = 365.2425 * day_secs
+    day_secs, year_secs = 24*60*60, 365.2425*24*60*60
     source_df['sin_day'] = np.sin(2 * np.pi * timestamp_s / day_secs)
     source_df['cos_day'] = np.cos(2 * np.pi * timestamp_s / day_secs)
     source_df['sin_year'] = np.sin(2 * np.pi * timestamp_s / year_secs)
@@ -171,7 +171,65 @@ def feature_selection():
     
     return render_template('feature_selection.html', page_data=page_data)
 
-# The download function has been removed.
+# --- Day 5: Machine Learning Models ---
+@app.route('/ml_models')
+def ml_models():
+    original_file = session.get('original_filepath')
+    if not original_file or not os.path.exists(original_file):
+        return redirect(url_for('upload_page'))
+
+    df = pd.read_csv(original_file, parse_dates=['Date and Hour'], index_col='Date and Hour')
+    df = df[~df.index.duplicated(keep='first')]
+    
+    page_data = {}
+
+    for source_name in ['Solar', 'Wind']:
+        source_df = df[df['Source'] == source_name].copy()
+        engineered_df = engineer_features(source_df)
+        
+        features = ['prod_lag_24h', 'rolling_mean_24h', 'rolling_std_24h', 
+                    'sin_day', 'cos_day', 'sin_year', 'cos_year']
+        X = engineered_df[features]
+        y = engineered_df['Production']
+
+        split_point = int(len(X) * 0.8)
+        X_train, X_test = X[:split_point], X[split_point:]
+        y_train, y_test = y[:split_point], y[split_point:]
+
+        rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
+        gb_model = GradientBoostingRegressor(n_estimators=100, random_state=42)
+        
+        rf_model.fit(X_train, y_train)
+        gb_model.fit(X_train, y_train)
+
+        rf_preds = rf_model.predict(X_test)
+        gb_preds = gb_model.predict(X_test)
+        
+        rf_metrics = {
+            'mae': f"{mean_absolute_error(y_test, rf_preds):.2f}",
+            'rmse': f"{np.sqrt(mean_squared_error(y_test, rf_preds)):.2f}",
+            'r2': f"{r2_score(y_test, rf_preds):.2%}"
+        }
+        gb_metrics = {
+            'mae': f"{mean_absolute_error(y_test, gb_preds):.2f}",
+            'rmse': f"{np.sqrt(mean_squared_error(y_test, gb_preds)):.2f}",
+            'r2': f"{r2_score(y_test, gb_preds):.2%}"
+        }
+        
+        # --- FIX: Added utc=True to handle timezone-aware data ---
+        labels_list = pd.to_datetime(y_test.index, utc=True).strftime('%Y-%m-%d').tolist()
+
+        page_data[source_name] = {
+            'metrics': {'RandomForest': rf_metrics, 'GradientBoosting': gb_metrics},
+            'chart_data': {
+                'labels': labels_list,
+                'actual': y_test.tolist(),
+                'rf_predicted': rf_preds.tolist(),
+                'gb_predicted': gb_preds.tolist()
+            }
+        }
+    
+    return render_template('ml_models.html', page_data=page_data)
 
 if __name__ == '__main__':
     app.run(debug=True)
