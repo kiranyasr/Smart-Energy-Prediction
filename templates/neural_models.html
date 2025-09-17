@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 6: Neural Models</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom/dist/chartjs-plugin-zoom.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="main-header">
+            <h1 class="title">DEEP LEARNING MODEL PERFORMANCE</h1>
+            <p class="subtitle">Evaluating LSTM vs. Hybrid Models for Solar & Wind Prediction</p>
+        </header>
+
+        <div class="view-selector">
+            <button class="view-btn active" onclick="updateView('Solar')">Solar</button>
+            <button class="view-btn" onclick="updateView('Wind')">Wind</button>
+        </div>
+
+        <div id="Solar-view" class="view-content">
+            <div class="chart-grid">
+                <div class="chart-container">
+                    <h3 class="chart-title">Training Loss (LSTM)</h3>
+                    <canvas id="solarLossChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 class="chart-title">Actual vs. Predicted (Solar)</h3>
+                    <canvas id="solarModelChart"></canvas>
+                </div>
+            </div>
+            <div class="results-container full-width">
+                <h3 class="chart-title">Model Performance Metrics</h3>
+                <table class="data-table">
+                    <thead><tr><th>Model</th><th>MAE</th><th>RMSE</th><th>R² Score</th></tr></thead>
+                    <tbody>
+                        <tr><td>LSTM</td><td>{{ page_data.Solar.metrics.LSTM.mae }}</td><td>{{ page_data.Solar.metrics.LSTM.rmse }}</td><td>{{ page_data.Solar.metrics.LSTM.r2 }}</td></tr>
+                        <tr><td>Hybrid (RF+LSTM)</td><td>{{ page_data.Solar.metrics.Hybrid.mae }}</td><td>{{ page_data.Solar.metrics.Hybrid.rmse }}</td><td>{{ page_data.Solar.metrics.Hybrid.r2 }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="Wind-view" class="view-content" style="display: none;">
+            <div class="chart-grid">
+                <div class="chart-container">
+                    <h3 class="chart-title">Training Loss (LSTM)</h3>
+                    <canvas id="windLossChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 class="chart-title">Actual vs. Predicted (Wind)</h3>
+                    <canvas id="windModelChart"></canvas>
+                </div>
+            </div>
+            <div class="results-container full-width">
+                <h3 class="chart-title">Model Performance Metrics</h3>
+                <table class="data-table">
+                    <thead><tr><th>Model</th><th>MAE</th><th>RMSE</th><th>R² Score</th></tr></thead>
+                    <tbody>
+                        <tr><td>LSTM</td><td>{{ page_data.Wind.metrics.LSTM.mae }}</td><td>{{ page_data.Wind.metrics.LSTM.rmse }}</td><td>{{ page_data.Wind.metrics.LSTM.r2 }}</td></tr>
+                        <tr><td>Hybrid (RF+LSTM)</td><td>{{ page_data.Wind.metrics.Hybrid.mae }}</td><td>{{ page_data.Wind.metrics.Hybrid.rmse }}</td><td>{{ page_data.Wind.metrics.Hybrid.r2 }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="actions">
+             <a href="{{ url_for('ml_models') }}" class="action-btn secondary">Back to ML Models</a>
+        </div>
+    </div>
+
+    <div class="actions">
+             <a href="{{ url_for('optimization') }}" class="action-btn">Optimize Models (Day 7)</a>
+             <a href="{{ url_for('ml_models') }}" class="action-btn secondary">Back to ML Models</a>
+        </div>
+        
+<script>
+    const pageData = {{ page_data | tojson }};
+    let solarLossChart, solarModelChart, windLossChart, windModelChart;
+
+    const commonOptions = {
+        responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { position: 'top', labels: { color: '#00e7ff' }}, zoom: { pan: { enabled: true, mode: 'x' }, zoom: { wheel: { enabled: true }, mode: 'x' }}}
+    };
+
+    function drawModelChart(canvasId, data) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        return new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.labels,
+                datasets: [
+                    { label: 'Actual', data: data.actual, borderColor: '#00e7ff', borderWidth: 2, pointRadius: 0 },
+                    { label: 'LSTM', data: data.lstm_predicted, borderColor: '#0ff36f', borderWidth: 1.5, pointRadius: 0, borderDash: [5, 5] },
+                    { label: 'Hybrid', data: data.hybrid_predicted, borderColor: '#f2c94c', borderWidth: 1.5, pointRadius: 0, borderDash: [5, 5] }
+                ]
+            },
+            options: { ...commonOptions, scales: { x: { type: 'time', time: { unit: 'day' }, ticks: { color: '#00e7ff88' }}, y: { ticks: { color: '#00e7ff88' }} }}
+        });
+    }
+    
+    function drawLossChart(canvasId, data) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        return new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.loss_epochs,
+                datasets: [{ label: 'Training Loss', data: data.loss_values, borderColor: '#00e7ff', backgroundColor: '#00e7ff11', fill: true, borderWidth: 1.5 }]
+            },
+            options: { ...commonOptions, scales: { x: { title: { display: true, text: 'Epochs', color: '#00e7ff' }, ticks: { color: '#00e7ff88' }}, y: { title: { display: true, text: 'Loss', color: '#00e7ff' }, ticks: { color: '#00e7ff88' }} }}
+        });
+    }
+
+    function updateView(source) {
+        document.querySelectorAll('.view-content').forEach(el => el.style.display = 'none');
+        document.getElementById(`${source}-view`).style.display = 'block';
+        document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.view-btn[onclick="updateView('${source}')"]`).classList.add('active');
+
+        if (source === 'Solar') {
+            if (!solarLossChart) solarLossChart = drawLossChart('solarLossChart', pageData.Solar.chart_data);
+            if (!solarModelChart) solarModelChart = drawModelChart('solarModelChart', pageData.Solar.chart_data);
+        } else if (source === 'Wind') {
+            if (!windLossChart) windLossChart = drawLossChart('windLossChart', pageData.Wind.chart_data);
+            if (!windModelChart) windModelChart = drawModelChart('windModelChart', pageData.Wind.chart_data);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => updateView('Solar'));
+</script>
+</body>
+</html>

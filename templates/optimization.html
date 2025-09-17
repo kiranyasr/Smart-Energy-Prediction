@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 7: Model Optimization</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="main-header">
+            <h1 class="title">HYPERPARAMETER OPTIMIZATION</h1>
+            <p class="subtitle">Comparing Default vs. Tuned Model Performance</p>
+        </header>
+
+        <div class="results-container full-width">
+            <h3 class="chart-title">Hyperparameter Comparison</h3>
+            <table class="data-table param-table">
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Parameter</th>
+                        <th>Default Value</th>
+                        <th>Tuned Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for model, params in page_data.params.items() %}
+                        {% for param, value in params.Default.items() %}
+                        <tr>
+                            {% if loop.first %}
+                                <td rowspan="{{ loop.length }}">{{ model }}</td>
+                            {% endif %}
+                            <td>{{ param }}</td>
+                            <td>{{ value }}</td>
+                            <td>{{ params.Tuned[param] }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="chart-grid">
+            <div class="chart-container">
+                <h3 class="chart-title">Performance Metrics Comparison (R² Score)</h3>
+                <canvas id="metricsChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3 class="chart-title">Training Time Comparison (Seconds)</h3>
+                <canvas id="timeChart"></canvas>
+            </div>
+        </div>
+
+        <div class="actions">
+             <a href="{{ url_for('neural_models') }}" class="action-btn secondary">Back to Neural Models</a>
+        </div>
+    </div>
+
+    <div class="actions">
+             <a href="{{ url_for('anomaly_detection') }}" class="action-btn">Detect Anomalies (Day 8)</a>
+             <a href="{{ url_for('neural_models') }}" class="action-btn secondary">Back to Neural Models</a>
+        </div>
+
+<script>
+    const pageData = {{ page_data | tojson }};
+    Chart.defaults.color = '#00e7ff88';
+
+    // --- Metrics Chart ---
+    const metricsCtx = document.getElementById('metricsChart').getContext('2d');
+    new Chart(metricsCtx, {
+        type: 'bar',
+        data: {
+            labels: ['RandomForest', 'GradientBoosting'],
+            datasets: [
+                {
+                    label: 'Default R²',
+                    data: [pageData.metrics.RandomForest.Default.r2, pageData.metrics.GradientBoosting.Default.r2],
+                    backgroundColor: '#00e7ff55',
+                    borderColor: '#00e7ff',
+                    borderWidth: 1.5
+                },
+                {
+                    label: 'Tuned R²',
+                    data: [pageData.metrics.RandomForest.Tuned.r2, pageData.metrics.GradientBoosting.Tuned.r2],
+                    backgroundColor: '#0ff36f55',
+                    borderColor: '#0ff36f',
+                    borderWidth: 1.5
+                }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#00e7ff' } } },
+            scales: {
+                x: { ticks: { color: '#00e7ff' } },
+                y: { title: { display: true, text: 'R² Score (%)', color: '#00e7ff' }, ticks: { color: '#00e7ff88' }}
+            }
+        }
+    });
+
+    // --- Training Time Chart ---
+    const timeCtx = document.getElementById('timeChart').getContext('2d');
+    new Chart(timeCtx, {
+        type: 'bar',
+        data: {
+            labels: ['RandomForest', 'GradientBoosting'],
+            datasets: [
+                {
+                    label: 'Default Time',
+                    data: [pageData.times.Default.RandomForest, pageData.times.Default.GradientBoosting],
+                    backgroundColor: '#00e7ff55',
+                    borderColor: '#00e7ff',
+                    borderWidth: 1.5
+                },
+                {
+                    label: 'Tuned Time',
+                    data: [pageData.times.Tuned.RandomForest, pageData.times.Tuned.GradientBoosting],
+                    backgroundColor: '#f2c94c55',
+                    borderColor: '#f2c94c',
+                    borderWidth: 1.5
+                }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#00e7ff' } } },
+            scales: {
+                x: { ticks: { color: '#00e7ff' } },
+                y: { title: { display: true, text: 'Time (s)', color: '#00e7ff' }, ticks: { color: '#00e7ff88' }}
+            }
+        }
+    });
+</script>
+</body>
+</html>

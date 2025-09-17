@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 8: Anomaly Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom/dist/chartjs-plugin-zoom.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="main-header">
+            <h1 class="title">ANOMALY DETECTION ANALYSIS</h1>
+            <p class="subtitle">Identifying Unexpected Production Events Using Model Residuals</p>
+        </header>
+
+        <div class="view-selector">
+            <button class="view-btn active" onclick="updateView('Solar')">Solar</button>
+            <button class="view-btn" onclick="updateView('Wind')">Wind</button>
+        </div>
+
+        <div id="Solar-view" class="view-content">
+            <div class="chart-container">
+                <h3 class="chart-title">Residual Plot (Actual - Predicted) with Anomalies Highlighted</h3>
+                <canvas id="solarResidualChart"></canvas>
+            </div>
+            <div class="results-container full-width">
+                <h3 class="chart-title">Detected Anomaly Events (Solar)</h3>
+                <table class="data-table">
+                    <thead><tr><th>Date</th><th>Magnitude (Error)</th></tr></thead>
+                    <tbody>
+                        {% for row in page_data.Solar.table %}
+                        <tr><td>{{ row.date.strftime('%Y-%m-%d %H:%M') }}</td><td>{{ row.magnitude | round(2) }}</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="Wind-view" class="view-content" style="display: none;">
+             <div class="chart-container">
+                <h3 class="chart-title">Residual Plot (Actual - Predicted) with Anomalies Highlighted</h3>
+                <canvas id="windResidualChart"></canvas>
+            </div>
+            <div class="results-container full-width">
+                <h3 class="chart-title">Detected Anomaly Events (Wind)</h3>
+                <table class="data-table">
+                    <thead><tr><th>Date</th><th>Magnitude (Error)</th></tr></thead>
+                    <tbody>
+                        {% for row in page_data.Wind.table %}
+                        <tr><td>{{ row.date.strftime('%Y-%m-%d %H:%M') }}</td><td>{{ row.magnitude | round(2) }}</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="actions">
+             <a href="{{ url_for('optimization') }}" class="action-btn secondary">Back to Optimization</a>
+        </div>
+    </div>
+
+<script>
+    const pageData = {{ page_data | tojson }};
+    let solarResidualChart, windResidualChart;
+
+    function drawResidualChart(canvasId, data) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        
+        // Highlight anomalies with a different color and size
+        const pointColors = data.anomalies.map(a => a === -1 ? '#f2c94c' : '#00e7ff');
+        const pointRadius = data.anomalies.map(a => a === -1 ? 5 : 0);
+
+        return new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: 'Residual (Error)',
+                    data: data.residuals,
+                    borderColor: '#00e7ff88',
+                    borderWidth: 1.5,
+                    pointBackgroundColor: pointColors,
+                    pointRadius: pointRadius,
+                    pointHoverRadius: 7
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+                plugins: { legend: { display: false }, zoom: { pan: { enabled: true, mode: 'x' }, zoom: { wheel: { enabled: true }, mode: 'x' }}},
+                scales: {
+                    x: { type: 'time', time: { unit: 'month' }, ticks: { color: '#00e7ff88' }},
+                    y: { title: { display: true, text: 'Prediction Error', color: '#00e7ff' }, ticks: { color: '#00e7ff88' }}
+                }
+            }
+        });
+    }
+
+    function updateView(source) {
+        document.querySelectorAll('.view-content').forEach(el => el.style.display = 'none');
+        document.getElementById(`${source}-view`).style.display = 'block';
+        document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.view-btn[onclick="updateView('${source}')"]`).classList.add('active');
+
+        if (source === 'Solar' && !solarResidualChart) {
+            solarResidualChart = drawResidualChart('solarResidualChart', pageData.Solar.chart_data);
+        } else if (source === 'Wind' && !windResidualChart) {
+            windResidualChart = drawResidualChart('windResidualChart', pageData.Wind.chart_data);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => updateView('Solar'));
+</script>
+</body>
+</html>

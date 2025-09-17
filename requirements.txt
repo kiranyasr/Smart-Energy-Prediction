@@ -1,3 +1,6 @@
-Flask==3.0.0
-pandas==2.2.1
-scikit-learn==1.4.1.post1
+Flask
+pandas
+scikit-learn
+reportlab
+matplotlib
+numpy

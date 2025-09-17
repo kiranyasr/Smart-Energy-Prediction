@@ -89,6 +89,11 @@
         </div>
     </div>
 
+    <div class="actions">
+             <a href="{{ url_for('neural_models') }}" class="action-btn">Train Neural Models (Day 6)</a>
+             <a href="{{ url_for('feature_selection') }}" class="action-btn secondary">Back to Feature Selection</a>
+        </div>
+
 <script>
     const pageData = {{ page_data | tojson }};
 
