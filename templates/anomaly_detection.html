@@ -21,43 +21,56 @@
             <button class="view-btn" onclick="updateView('Wind')">Wind</button>
         </div>
 
+        <!-- Solar Section -->
         <div id="Solar-view" class="view-content">
             <div class="chart-container">
                 <h3 class="chart-title">Residual Plot (Actual - Predicted) with Anomalies Highlighted</h3>
                 <canvas id="solarResidualChart"></canvas>
             </div>
-            <div class="results-container full-width">
+            <!-- CORRECTED: Anomaly table is now wrapped in a proper container -->
+            <div class="results-container full-width anomaly-table-container">
                 <h3 class="chart-title">Detected Anomaly Events (Solar)</h3>
-                <table class="data-table">
-                    <thead><tr><th>Date</th><th>Magnitude (Error)</th></tr></thead>
-                    <tbody>
-                        {% for row in page_data.Solar.table %}
-                        <tr><td>{{ row.date.strftime('%Y-%m-%d %H:%M') }}</td><td>{{ row.magnitude | round(2) }}</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead><tr><th>Date</th><th>Magnitude (Error)</th></tr></thead>
+                        <tbody>
+                            {% for row in page_data.Solar.table %}
+                            <tr><td>{{ row.date.strftime('%Y-%m-%d %H:%M') }}</td><td>{{ row.magnitude | round(2) }}</td></tr>
+                            {% else %}
+                            <tr><td colspan="2">No anomalies detected.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
+        <!-- Wind Section -->
         <div id="Wind-view" class="view-content" style="display: none;">
              <div class="chart-container">
                 <h3 class="chart-title">Residual Plot (Actual - Predicted) with Anomalies Highlighted</h3>
                 <canvas id="windResidualChart"></canvas>
             </div>
-            <div class="results-container full-width">
+             <!-- CORRECTED: Anomaly table is now wrapped in a proper container -->
+            <div class="results-container full-width anomaly-table-container">
                 <h3 class="chart-title">Detected Anomaly Events (Wind)</h3>
-                <table class="data-table">
-                    <thead><tr><th>Date</th><th>Magnitude (Error)</th></tr></thead>
-                    <tbody>
-                        {% for row in page_data.Wind.table %}
-                        <tr><td>{{ row.date.strftime('%Y-%m-%d %H:%M') }}</td><td>{{ row.magnitude | round(2) }}</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead><tr><th>Date</th><th>Magnitude (Error)</th></tr></thead>
+                        <tbody>
+                             {% for row in page_data.Wind.table %}
+                            <tr><td>{{ row.date.strftime('%Y-%m-%d %H:%M') }}</td><td>{{ row.magnitude | round(2) }}</td></tr>
+                            {% else %}
+                            <tr><td colspan="2">No anomalies detected.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
         <div class="actions">
+             <a href="{{ url_for('comparison') }}" class="action-btn">View Final Report (Day 9)</a>
              <a href="{{ url_for('optimization') }}" class="action-btn secondary">Back to Optimization</a>
         </div>
     </div>
@@ -69,7 +82,6 @@
     function drawResidualChart(canvasId, data) {
         const ctx = document.getElementById(canvasId).getContext('2d');
         
-        // Highlight anomalies with a different color and size
         const pointColors = data.anomalies.map(a => a === -1 ? '#f2c94c' : '#00e7ff');
         const pointRadius = data.anomalies.map(a => a === -1 ? 5 : 0);
 
@@ -107,7 +119,7 @@
         if (source === 'Solar' && !solarResidualChart) {
             solarResidualChart = drawResidualChart('solarResidualChart', pageData.Solar.chart_data);
         } else if (source === 'Wind' && !windResidualChart) {
-            windResidualChart = drawResidualChart('windResidualChart', pageData.Wind.chart_data);
+            windResidualChart = drawResidualChart('windResidualChart', page_data.Wind.chart_data);
         }
     }
 

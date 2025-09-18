@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 9: Final Report</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header class="main-header">
+            <h1 class="title">COMPREHENSIVE MODEL COMPARISON</h1>
+            <p class="subtitle">Final performance metrics and analysis for all models</p>
+        </header>
+
+        <div class="model-section">
+            <h2 class="section-title">Solar Models</h2>
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead><tr><th>Model</th><th>MAE</th><th>RMSE</th><th>R² Score</th><th>Training Time</th></tr></thead>
+                    <tbody>
+                    {% for name, metrics in results.Solar.items() %}
+                        <tr><td>{{ name }}</td><td>{{ metrics.MAE }}</td><td>{{ metrics.RMSE }}</td><td>{{ metrics['R²'] }}</td><td>{{ metrics['Training Time'] }}</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="chart-grid">
+                <div class="chart-container"><img src="{{ url_for('static', filename=plots['Solar_accuracy'].replace('static/', '')) }}" alt="Solar Accuracy Chart"></div>
+                <div class="chart-container"><img src="{{ url_for('static', filename=plots['Solar_errors'].replace('static/', '')) }}" alt="Solar Errors Chart"></div>
+            </div>
+        </div>
+
+        <div class="model-section">
+            <h2 class="section-title">Wind Models</h2>
+             <div class="table-wrapper">
+                <table class="data-table">
+                    <thead><tr><th>Model</th><th>MAE</th><th>RMSE</th><th>R² Score</th><th>Training Time</th></tr></thead>
+                    <tbody>
+                    {% for name, metrics in results.Wind.items() %}
+                        <tr><td>{{ name }}</td><td>{{ metrics.MAE }}</td><td>{{ metrics.RMSE }}</td><td>{{ metrics['R²'] }}</td><td>{{ metrics['Training Time'] }}</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="chart-grid">
+                <div class="chart-container"><img src="{{ url_for('static', filename=plots['Wind_accuracy'].replace('static/', '')) }}" alt="Wind Accuracy Chart"></div>
+                <div class="chart-container"><img src="{{ url_for('static', filename=plots['Wind_errors'].replace('static/', '')) }}" alt="Wind Errors Chart"></div>
+            </div>
+        </div>
+
+        <div class="actions">
+             <a href="{{ url_for('download_report') }}" class="action-btn">Download Final Report (PDF)</a>
+             <a href="{{ url_for('anomaly_detection') }}" class="action-btn secondary">Back to Anomaly Detection</a>
+        </div>
+    </div>
+</body>
+</html>

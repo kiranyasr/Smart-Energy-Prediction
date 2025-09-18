@@ -21,7 +21,7 @@ body {
   text-align: center;
 }
 
-/* Header */
+/* --- General Components (Used across multiple pages) --- */
 .main-header {
   margin-bottom: 40px;
 }
@@ -40,68 +40,12 @@ body {
   font-weight: 400;
 }
 
-/* KPI Cards */
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 30px;
-  margin-bottom: 40px;
-}
-
-.kpi-card {
-  background: rgba(5, 29, 41, 0.75);
-  border: 1px solid #00e7ff88;
-  border-radius: 12px;
-  padding: 25px;
-  box-shadow: 0 0 25px #00e7ff22;
-  text-align: left;
-}
-
-.kpi-title {
-  font-size: 0.9rem;
-  color: #cad7e2aa;
-  margin-bottom: 10px;
-}
-
-.kpi-value {
-  font-size: 2.2rem;
-  font-weight: 600;
-  color: #0ff36f;
-  text-shadow: 0 0 8px #0ff36f88;
-}
-
-/* Charts */
-.chart-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 30px;
-  margin-bottom: 40px;
-}
-
-.chart-container {
-  background: rgba(5, 29, 41, 0.75);
-  border: 1px solid #00e7ff88;
-  border-radius: 12px;
-  padding: 25px;
-  box-shadow: 0 0 25px #00e7ff22;
-  /* Set a fixed height for the charts */
-  height: 450px; 
-}
-
-.chart-title {
-    font-size: 1rem;
-    font-weight: 500;
-    color: #00e7ff;
-    margin-bottom: 20px;
-    text-align: left;
-}
-
-/* Action Buttons */
 .actions {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 40px;
 }
 
 .action-btn {
@@ -128,12 +72,11 @@ body {
 }
 
 .action-btn.secondary {
-    border-color: #cad7e26e;
-    color: #cad7e2aa;
-    box-shadow: none;
+  border-color: #cad7e26e;
+  color: #cad7e2aa;
+  box-shadow: none;
 }
 
-/* View Selector Buttons */
 .view-selector {
   display: flex;
   justify-content: center;
@@ -171,7 +114,61 @@ body {
   box-shadow: 0 0 15px #00e7ff;
 }
 
-/* Styles for Day 4 Feature Lists */
+.chart-title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #00e7ff;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+/* --- Day 2: Dashboard --- */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+.kpi-card {
+  background: rgba(5, 29, 41, 0.75);
+  border: 1px solid #00e7ff88;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 0 25px #00e7ff22;
+  text-align: left;
+}
+
+.kpi-title {
+  font-size: 0.9rem;
+  color: #cad7e2aa;
+  margin-bottom: 10px;
+}
+
+.kpi-value {
+  font-size: 2.2rem;
+  font-weight: 600;
+  color: #0ff36f;
+  text-shadow: 0 0 8px #0ff36f88;
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+.chart-container {
+  background: rgba(5, 29, 41, 0.75);
+  border: 1px solid #00e7ff88;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 0 25px #00e7ff22;
+  height: 450px;
+}
+
+/* --- Day 4: Feature Selection --- */
 .feature-list-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -212,7 +209,7 @@ body {
   color: #f2c94c;
 }
 
-/* Styles for Day 5 ML Models Page */
+/* --- Day 5, 8, 9: Model Sections & Tables --- */
 .model-section {
   margin-bottom: 50px;
   background: rgba(5, 29, 41, 0.5);
@@ -231,57 +228,84 @@ body {
   padding-bottom: 10px;
 }
 
-.results-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 0 20px;
-}
-
-/* Ensure data-table is styled correctly */
-.data-table tbody td {
-    font-weight: 600;
-}
-
-/* Styles for Day 6 Neural Models Page */
 .results-container.full-width {
-    grid-column: 1 / -1; /* Makes the container span the full width of the grid */
-    padding: 0;
-    margin-top: 30px;
+  grid-column: 1 / -1;
+  padding: 0;
+  margin-top: 30px;
 }
 
-/* Styles for Day 7 Optimization Page */
-.param-table td, .param-table th {
-    text-align: left;
+.anomaly-table-container {
+    background: rgba(5, 29, 41, 0.75);
+    border: 1px solid #00e7ff88;
+    border-radius: 12px;
+    padding: 25px;
 }
 
-.param-table td[rowspan] {
-    vertical-align: middle;
-    font-weight: 600;
-    color: #00e7ff;
+.table-wrapper {
+    max-height: 400px;
+    overflow-y: auto;
 }
 
-/* Responsive */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table thead th {
+  color: #00e7ff;
+  font-weight: 600;
+  padding: 12px 15px;
+  border-bottom: 1.5px solid #00e7ff;
+  text-align: left;
+}
+
+.data-table tbody tr:hover {
+  background-color: #003c56aa;
+}
+
+.data-table tbody td {
+  color: #9afcff;
+  padding: 12px 15px;
+  border-top: 1px solid #003c56;
+  text-align: left;
+}
+
+/* --- Day 9: Comparison Page --- */
+.chart-container img {
+  max-width: 100%;
+  height: auto;
+  background-color: transparent;
+  border-radius: 8px;
+}
+
+.chart-container.full-width {
+  grid-column: 1 / -1;
+}
+
+/* --- Responsive Adjustments --- */
 @media (max-width: 1200px) {
-    .chart-grid {
-        grid-template-columns: 1fr;
-    }
+  .chart-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 900px) {
-    .kpi-grid {
-        grid-template-columns: 1fr;
-    }
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+  .feature-list-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 768px) {
-    body {
-        padding: 20px;
-    }
-    .title {
-        font-size: 1.8rem;
-    }
-    .subtitle {
-        font-size: 0.9rem;
-    }
+  body {
+    padding: 20px;
+  }
+  .title {
+    font-size: 1.8rem;
+  }
+  .subtitle {
+    font-size: 0.9rem;
+  }
 }
